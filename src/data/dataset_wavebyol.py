@@ -40,10 +40,12 @@ class WaveformDatasetByWaveBYOL(Dataset):
                                                   fit=False)
         waveform02 = audio_io.audio_adjust_length(load_waveform(audio_file, self.sampling_rate), self.audio_window,
                                                   fit=False)
-        pick_index = np.random.randint(waveform01.shape[1] - self.audio_window + 1)
-        waveform01 = audio_io.random_cutoff(waveform01, self.audio_window, pick_index)
-        waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick_index)
+
         if len(self.augmentation) != 0:
+            pick_index = np.random.randint(
+                waveform01.shape[1] - self.audio_window + 1 + 8000)  # 약간 오버사이즈로 자르고 # augmentation하면서 자르기
+            waveform01 = audio_io.random_cutoff(waveform01, self.audio_window, pick_index)
+            waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick_index)
             waveform01 = audio_augmentation.audio_augmentation_pipeline(waveform01, self.sampling_rate,
                                                                         self.audio_window,
                                                                         random.sample(self.augmentation,
@@ -54,5 +56,10 @@ class WaveformDatasetByWaveBYOL(Dataset):
                                                                         random.sample(self.augmentation,
                                                                                       self.augmentation_count),
                                                                         fix_audio_length=True)
+        else:
+            pick_index = np.random.randint(
+                waveform01.shape[1] - self.audio_window + 1)
+            waveform01 = audio_io.random_cutoff(waveform01, self.audio_window, pick_index)
+            waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick_index)
 
         return waveform01, waveform02

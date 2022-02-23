@@ -17,8 +17,8 @@ def audio_additive_noise(x, sr, audio_window=20480, datalist_path="./dataset/mus
         filelist = file_io.read_txt2list(dataset_path)
         pick = np.random.randint(len(filelist))
         waveform, sampling_rate = audio_io.audio_loader(filelist[pick][4:])
-        waveform = audio_io.audio_adjust_length(waveform, audio_window)
-        waveform = audio_io.random_cutoff(waveform, audio_window)
+        waveform = audio_io.audio_adjust_length(waveform, len(x[0]))
+        waveform = audio_io.random_cutoff(waveform, len(x[0]))
         return waveform[0]
     combination = augment.EffectChain() \
         .additive_noise(noise_generator, snr=np.random.randint(15)+5)
@@ -62,7 +62,7 @@ def audio_speed(x, sr, audio_window=None, rate=None):
     if rate is not None:
         effects = [['speed', str(rate)]]
     else:
-        random_rate = [0.95, 0.93, 0.9, 0.85, 0.83, 0.8, 0.75]
+        random_rate = [0.95, 0.93, 0.9, 0.85, 0.83, 0.8, 0.75, 0.6, 0.5]
         picked = random.sample(random_rate, 1)[0]
         effects = [['speed', str(picked)]]
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(x, sr, effects)

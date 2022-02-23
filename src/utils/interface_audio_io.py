@@ -36,8 +36,10 @@ def audio_adjust_length(x, audio_window, fit=False):
     if length_adj > 0:
         half_adj = length_adj // 2
         x = F.pad(x, (half_adj, length_adj - half_adj))
+    audio_length = len(x[0])
     if fit:
-        x = x[:, :audio_window]
+        random_index = np.random.randint(audio_length - audio_window + 1)
+        x = x[:, random_index: random_index + audio_window]
     return x
 
 

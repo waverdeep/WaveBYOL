@@ -79,6 +79,16 @@ def add_byol_latent_heatmap(writer, online1, online2, target1, target2, title, d
     plt.close()
 
 
+def add_train_latent_heatmap(writer, online01, online02, target01, target02, title, desc, epoch):
+    fig, axes = plt.subplots(1, 4)
+    axes[0].matshow(online01, aspect='equal')  # , aspect='auto')
+    axes[1].matshow(online02, aspect='equal')  # , aspect='auto')
+    axes[2].matshow(target01, aspect='equal')  # , aspect='auto')
+    axes[3].matshow(target02, aspect='equal')  # , aspect='auto')
+    writer.add_figure('{}/{}'.format(title, desc), fig, epoch)
+    plt.close()
+
+
 
 
 

@@ -4,13 +4,7 @@ import random
 import numpy as np
 import os
 import torch.cuda
-import src.optimizers.optimizer as optimizers
-import src.data.dataset as dataset
-import src.models.model as model_pack
-import src.utils.interface_tensorboard as tensorboard
-from apex.parallel import DistributedDataParallel as DDP
 from datetime import datetime
-import src.utils.interface_plot as plots
 import src.utils.interface_file_io as file_io
 
 

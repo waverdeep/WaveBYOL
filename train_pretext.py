@@ -2,17 +2,18 @@ import argparse
 import os
 import torch
 import json
+import numpy as np
 import src.utils.interface_train_tool as train_tool
 import src.utils.interface_tensorboard as tensorboard
 import src.data.dataset as dataset
 import src.models.model as model
 import src.optimizers.optimizer as optimizer
-
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 def main():
     parser = argparse.ArgumentParser(description='waverdeep - WaveBYOL')
     parser.add_argument("--configuration", required=False,
-                        default='./config/config_pretext_baseline_FSD50K_T01.json')
+                        default='./config/T02-pretext-WaveBYOL-Reconst-20480.json')
     args = parser.parse_args()
     now = train_tool.setup_timestamp()
 
@@ -72,7 +73,7 @@ def main():
         elif test_loss < best_loss:
             best_loss = test_loss
             best_epoch = epoch
-            train_tool.save_checkpoint(config=config, model=model, optimizer=optimizer,
+            train_tool.save_checkpoint(config=config, model=pretext_model, optimizer=pretext_model,
                                        loss=test_loss, epoch=best_epoch, mode="best",
                                        date='{}'.format(now))
             print("save checkpoint at {} epoch...".format(num_of_epoch))
@@ -95,6 +96,36 @@ def train(config, writer, epoch, pretext_model, data_loader, pretext_optimizer):
         writer.add_scalar('Loss/train_step', out_loss, (epoch - 1) * len(data_loader) + batch_idx)
         total_loss += len(data01) * out_loss
 
+        if batch_idx % 20 == 0:
+            outputs = []
+            for i in range(4):
+                representation = representations[i].detach().cpu().numpy()
+                temp = []  # np.vstack()
+                for i in range(64):
+                    temp.append(representation[0][i].T)
+                outputs.append(np.vstack(temp))
+
+            tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+                                                 "TrainLatentSpace",
+                                                 "Large",
+                                                 (epoch - 1) * len(data_loader) + batch_idx
+                                                 )
+
+            outputs = []
+            for i in range(4):
+                representation = representations[i].detach().cpu().numpy()
+                temp = []  # np.vstack()
+                for i in range(2):
+                    temp.append(representation[0][i].T)
+                outputs.append(np.vstack(temp))
+
+            tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+                                                 "TrainLatentSpace",
+                                                 "Small",
+                                                 (epoch - 1) * len(data_loader) + batch_idx
+                                                 )
+
+
     total_loss /= len(data_loader.dataset)  # average loss
     writer.add_scalar('Loss/train', total_loss, (epoch - 1))
     return total_loss
@@ -111,6 +142,35 @@ def test(config, writer, epoch, pretext_model, data_loader):
             out_loss, representations = pretext_model(data01, data02)
             writer.add_scalar('Loss/test_step', out_loss, (epoch - 1) * len(data_loader) + batch_idx)
             total_loss += len(data01) * out_loss
+
+            if batch_idx % 20 == 0:
+                outputs = []
+                for i in range(4):
+                    representation = representations[i].detach().cpu().numpy()
+                    temp = []  # np.vstack()
+                    for i in range(64):
+                        temp.append(representation[0][i].T)
+                    outputs.append(np.vstack(temp))
+
+                tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+                                                     "TestLatentSpace",
+                                                     "Large",
+                                                     (epoch - 1) * len(data_loader) + batch_idx
+                                                     )
+
+                outputs = []
+                for i in range(4):
+                    representation = representations[i].detach().cpu().numpy()
+                    temp = []  # np.vstack()
+                    for i in range(2):
+                        temp.append(representation[0][i].T)
+                    outputs.append(np.vstack(temp))
+
+                tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+                                                     "TestLatentSpace",
+                                                     "Small",
+                                                     (epoch - 1) * len(data_loader) + batch_idx
+                                                     )
 
         total_loss /= len(data_loader.dataset)  # average loss
         writer.add_scalar('Loss/test', total_loss, (epoch - 1))
