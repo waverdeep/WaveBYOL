@@ -1,4 +1,6 @@
 import src.data.dataset_wavebyol as dataset_wavebyol
+import src.data.dataset_urbansound as dataset_urbansound
+import src.data.dataset_voxceleb as dataset_voxceleb
 from torch.utils import data
 
 
@@ -8,6 +10,30 @@ def get_dataloader(config, mode="train"):
 
     if dataset_type == 'WaveformDatasetByWaveBYOL':
         dataset = dataset_wavebyol.WaveformDatasetByWaveBYOL(
+            file_path=config['{}_dataset'.format(mode)],
+            audio_window=config['audio_window'],
+            sampling_rate=config['sampling_rate'],
+            augmentation=config['{}_augmentation'.format(mode)],
+            augmentation_count=config['augmentation_count']
+        )
+    elif dataset_type == 'WaveformDatasetByWaveBYOLTypeA':
+        dataset = dataset_wavebyol.WaveformDatasetByWaveBYOLTypeA(
+            file_path=config['{}_dataset'.format(mode)],
+            audio_window=config['audio_window'],
+            sampling_rate=config['sampling_rate'],
+            augmentation=config['{}_augmentation'.format(mode)],
+            augmentation_count=config['augmentation_count']
+        )
+    elif dataset_type =='UrbanSound8KWaveformDatasetByWaveBYOLTypeA':
+        dataset = dataset_urbansound.UrbanSound8KWaveformDatasetByWaveBYOLTypeA(
+            file_path=config['{}_dataset'.format(mode)],
+            audio_window=config['audio_window'],
+            sampling_rate=config['sampling_rate'],
+            augmentation=config['{}_augmentation'.format(mode)],
+            augmentation_count=config['augmentation_count']
+        )
+    elif dataset_type =='VoxCelebWaveformDatasetByWaveBYOLTypeA':
+        dataset = dataset_voxceleb.VoxCelebWaveformDatasetByWaveBYOLTypeA(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
             sampling_rate=config['sampling_rate'],
