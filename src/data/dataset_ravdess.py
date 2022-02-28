@@ -1,3 +1,4 @@
+# ../../dataset/ravdess/ravdess_song/Actor_09/03-02-06-01-01-02-09.wav
 from torch.utils.data import Dataset
 import src.utils.interface_file_io as file_io
 import src.utils.interface_audio_io as audio_io
@@ -19,12 +20,12 @@ def get_audio_file_path(file_list, index):
     audio_file = file_list[index]
     return audio_file[4:]
 
-
+# ./dataset/ravdess/ravdess_song/Actor_09/03-02-06-01-01-02-09.wav
 def get_audio_file_with_speaker_info(file_list, index):
     audio_file = get_audio_file_path(file_list, index)
     temp = audio_file.split('/')
-    speaker_id = temp[4]
-    speaker_id = speaker_id.split('_')[0]
+    speaker_id = temp[5]
+    speaker_id = speaker_id.split('-')[2]
     return audio_file, speaker_id
 
 
@@ -43,10 +44,11 @@ def load_waveform(audio_file, required_sampling_rate):
     return waveform
 
 
-class NsynthWaveformDatasetByWaveBYOLTypeA(Dataset):
+# ravdess 평균 길이? -> 이거 확인한번 해보아야 할듯
+class RAVDESSWaveformDatasetByWaveBYOLTypeA(Dataset):
     def __init__(self, file_path, audio_window=20480, sampling_rate=16000, augmentation=[1, 2, 3, 4, 5, 6],
-                 augmentation_count=5, speaker_filelist="./dataset/nsynth-label.txt", config=None):
-        super(NsynthWaveformDatasetByWaveBYOLTypeA, self).__init__()
+                 augmentation_count=5, speaker_filelist="./dataset/ravdess-label.txt", config=None):
+        super(RAVDESSWaveformDatasetByWaveBYOLTypeA, self).__init__()
         self.file_path = file_path
         self.audio_window = audio_window
         self.sampling_rate = sampling_rate
@@ -61,7 +63,6 @@ class NsynthWaveformDatasetByWaveBYOLTypeA(Dataset):
         self.augmentation = augmentation
         self.acoustic_list = natsort.natsorted(file_io.read_txt2list(speaker_filelist))
         self.acoustic_dict = get_acoustic_dict(self.acoustic_list)
-
         self.config = config
 
     def __len__(self):

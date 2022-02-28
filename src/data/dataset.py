@@ -1,24 +1,32 @@
 import src.data.dataset_wavebyol as dataset_wavebyol
-import src.data.dataset_urbansound as dataset_urbansound
-import src.data.dataset_voxceleb as dataset_voxceleb
-import src.data.dataset_nsynth as dataset_nsynth
-import src.data.dataset_speech_command as dataset_speech_command
+import src.data.dataset_downstream as dataset_downstream
+import src.utils.interface_audio_io as audio_io
 from torch.utils import data
+import numpy as np
+
+
+def get_random_start_point(size, audio_window):
+    return np.random.randint(size - audio_window + 1)
+
+
+def get_audio_filename_path_with_index(file_list, index):
+    audio_file = file_list[index]
+    return audio_file[4:]
+
+
+def load_waveform(audio_file, required_sampling_rate):
+    waveform, sampling_rate = audio_io.audio_loader(audio_file)
+    assert (
+            sampling_rate == required_sampling_rate
+    ), "sampling rate is not consistent throughout the dataset"
+    return waveform
 
 
 def get_dataloader(config, mode="train"):
     dataset_type = config['dataset_type']
     dataset = None
 
-    if dataset_type == 'WaveformDatasetByWaveBYOL':
-        dataset = dataset_wavebyol.WaveformDatasetByWaveBYOL(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
-        )
-    elif dataset_type == 'WaveformDatasetByWaveBYOLTypeA':
+    if dataset_type == 'pretext':
         dataset = dataset_wavebyol.WaveformDatasetByWaveBYOLTypeA(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
@@ -26,38 +34,18 @@ def get_dataloader(config, mode="train"):
             augmentation=config['{}_augmentation'.format(mode)],
             augmentation_count=config['augmentation_count']
         )
-    elif dataset_type == 'UrbanSound8KWaveformDatasetByWaveBYOLTypeA':
-        dataset = dataset_urbansound.UrbanSound8KWaveformDatasetByWaveBYOLTypeA(
+    elif dataset_type == 'downstream':
+        dataset = dataset_downstream.WaveformDataset(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
             sampling_rate=config['sampling_rate'],
             augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
+            augmentation_count=config['augmentation_count'],
+            label_file_path=config['label_file_path'],
+            metadata=config['metadata'],
+            config=config
         )
-    elif dataset_type == 'VoxCelebWaveformDatasetByWaveBYOLTypeA':
-        dataset = dataset_voxceleb.VoxCelebWaveformDatasetByWaveBYOLTypeA(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
-        )
-    elif dataset_type == 'NsynthWaveformDatasetByWaveBYOLTypeA':
-        dataset = dataset_nsynth.NsynthWaveformDatasetByWaveBYOLTypeA(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
-        )
-    elif dataset_type == 'SpeechCommandWaveformDatasetByWaveBYOLTypeA':
-        dataset = dataset_speech_command.SpeechCommandWaveformDatasetByWaveBYOLTypeA(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
-        )
+
     dataloader = data.DataLoader(
         dataset=dataset,
         batch_size=config['batch_size'],
