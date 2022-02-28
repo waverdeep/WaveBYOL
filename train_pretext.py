@@ -13,7 +13,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 def main():
     parser = argparse.ArgumentParser(description='waverdeep - WaveBYOL')
     parser.add_argument("--configuration", required=False,
-                        default='./config/T02-pretext-WaveBYOL-Reconst-20480.json')
+                        default='./config/T05-pretext-WaveBYOL-Original-15200.json')
     args = parser.parse_args()
     now = train_tool.setup_timestamp()
 
@@ -72,7 +72,7 @@ def main():
             best_loss = test_loss
         elif test_loss < best_loss:
             best_loss = test_loss
-            best_epoch = epoch
+            best_epoch = num_of_epoch
             train_tool.save_checkpoint(config=config, model=pretext_model, optimizer=pretext_model,
                                        loss=test_loss, epoch=best_epoch, mode="best",
                                        date='{}'.format(now))
@@ -85,8 +85,9 @@ def train(config, writer, epoch, pretext_model, data_loader, pretext_optimizer):
     pretext_model.train()
     pretext_model.update_target_weight()
     total_loss = 0.0
-    for batch_idx, (waveform01, waveform02) in enumerate(data_loader):
+    for batch_idx, (waveform_original, waveform01, waveform02) in enumerate(data_loader):
         if config['use_cuda']:
+            # data_original = waveform_original.cuda()
             data01 = waveform01.cuda()
             data02 = waveform02.cuda()
         out_loss, representations = pretext_model(data01, data02)
@@ -97,11 +98,21 @@ def train(config, writer, epoch, pretext_model, data_loader, pretext_optimizer):
         total_loss += len(data01) * out_loss
 
         if batch_idx % 20 == 0:
+            # outputs = []
+            # for i in range(4):
+            #     representation = representations[i].detach().cpu().numpy()
+            #     outputs.append(representation[0])
+            # tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+            #                                      "TrainLatentSpace",
+            #                                      "Large",
+            #                                      (epoch - 1) * len(data_loader) + batch_idx
+            #                                      )
+
             outputs = []
             for i in range(4):
                 representation = representations[i].detach().cpu().numpy()
                 temp = []  # np.vstack()
-                for i in range(64):
+                for i in range(16):
                     temp.append(representation[0][i].T)
                 outputs.append(np.vstack(temp))
 
@@ -116,7 +127,7 @@ def train(config, writer, epoch, pretext_model, data_loader, pretext_optimizer):
                 representation = representations[i].detach().cpu().numpy()
                 temp = []  # np.vstack()
                 for i in range(2):
-                    temp.append(representation[0][i].T)
+                    temp.append(representation[0][i])
                 outputs.append(np.vstack(temp))
 
             tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
@@ -135,8 +146,9 @@ def test(config, writer, epoch, pretext_model, data_loader):
     pretext_model.eval()
     total_loss = 0.0
     with torch.no_grad():
-        for batch_idx, (waveform01, waveform02) in enumerate(data_loader):
+        for batch_idx, (waveform_original, waveform01, waveform02) in enumerate(data_loader):
             if config['use_cuda']:
+                # data_original = waveform_original.cuda()
                 data01 = waveform01.cuda()
                 data02 = waveform02.cuda()
             out_loss, representations = pretext_model(data01, data02)
@@ -144,11 +156,20 @@ def test(config, writer, epoch, pretext_model, data_loader):
             total_loss += len(data01) * out_loss
 
             if batch_idx % 20 == 0:
+                # outputs = []
+                # for i in range(4):
+                #     representation = representations[i].detach().cpu().numpy()
+                #     outputs.append(representation[0])
+                # tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
+                #                                      "TrainLatentSpace",
+                #                                      "Large",
+                #                                      (epoch - 1) * len(data_loader) + batch_idx
+                #                                      )
                 outputs = []
                 for i in range(4):
                     representation = representations[i].detach().cpu().numpy()
                     temp = []  # np.vstack()
-                    for i in range(64):
+                    for i in range(16):
                         temp.append(representation[0][i].T)
                     outputs.append(np.vstack(temp))
 
@@ -163,7 +184,7 @@ def test(config, writer, epoch, pretext_model, data_loader):
                     representation = representations[i].detach().cpu().numpy()
                     temp = []  # np.vstack()
                     for i in range(2):
-                        temp.append(representation[0][i].T)
+                        temp.append(representation[0][i])
                     outputs.append(np.vstack(temp))
 
                 tensorboard.add_train_latent_heatmap(writer, outputs[0], outputs[1], outputs[2], outputs[3],
