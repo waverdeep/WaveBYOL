@@ -14,7 +14,7 @@
 	"augmentation_count": 5,
 	"test_augmentation": [],
 
-	"num_workers": 8,
+	"num_workers": 10,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 

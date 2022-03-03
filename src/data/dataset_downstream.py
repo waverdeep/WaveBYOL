@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import src.utils.interface_file_io as file_io
 import src.utils.interface_audio_io as audio_io
 import src.utils.interface_audio_augmentation as audio_augmentation
-import src.data.dataset as dataset
+from src.data import dataset as dataset
 import random
 import natsort
 import pandas as pd
@@ -14,11 +14,20 @@ def get_label_dict(label_list):
         label_dict[str(key)] = idx
     return label_dict
 
+# def get_audio_file_with_acoustic_info(file_list, index):
+#     audio_file = dataset_baseline.get_audio_file(file_list, index)
+#     filename = audio_file.split('/')[5]
+#     acoustic_id = filename.split('-')[1]
+#     return audio_file, filename, acoustic_id
 
-def load_audio_with_label(file_list, index):
-    audio_file = dataset.get_audio_filename_path_with_index(file_list, index)
-    temp = audio_file.split('/')
-    label = temp[4]
+
+def load_audio_with_label(file_list, index, dataset_name=None):
+    if dataset_name == 'UrbanSound8K':
+        audio_file = dataset.get_audio_filename_path_with_index(file_list, index)
+        temp = audio_file.split('/')
+        label = temp[4]
+    else:
+
     return audio_file, label
 
 
@@ -26,7 +35,7 @@ class WaveformDataset(Dataset):
     def __init__(self, file_path: str, audio_window=20480, sampling_rate=16000,
                  augmentation=[1, 2, 3, 4, 5, 6], augmentation_count=5,
                  label_file_path=None,
-                 metadata=None, config=None):
+                 metadata=None, config=None, dataset_name=None):
         super(WaveformDataset, self).__init__()
         self.audio_window = audio_window
         self.sampling_rate = sampling_rate
@@ -35,6 +44,7 @@ class WaveformDataset(Dataset):
         self.file_list = file_io.read_txt2list(file_path)
         self.metadata = metadata
         self.config = config
+        self.dataset_name = dataset_name
 
         if self.metadata is not None:
             self.metadata = pd.read_csv(metadata)
@@ -48,7 +58,7 @@ class WaveformDataset(Dataset):
         return len(self.file_list)
 
     def __getitem__(self, index):
-        audio_file, label = load_audio_with_label(self.file_list, index)
+        audio_file, label = load_audio_with_label(self.file_list, index, self.dataset_name)
         waveform = audio_io.audio_adjust_length(
             dataset.load_waveform(audio_file, self.sampling_rate), self.audio_window, fit=False)
 

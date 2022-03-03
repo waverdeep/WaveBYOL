@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import src.utils.interface_file_io as file_io
 import src.utils.interface_audio_io as audio_io
 import src.utils.interface_audio_augmentation as audio_augmentation
-import src.data.dataset as dataset
+from src.data import dataset as dataset
 import random
 
 
@@ -21,7 +21,7 @@ class WaveformDatasetByWaveBYOL(Dataset):
         return len(self.file_list)
 
     def __getitem__(self, index):
-        audio_file = dataset.get_audio_file_path(self.file_list, index)
+        audio_file = dataset.get_audio_filename_path_with_index(self.file_list, index)
         waveform01 = audio_io.audio_adjust_length(
             dataset.load_waveform(audio_file, self.sampling_rate),
             self.audio_window, fit=False)
@@ -29,10 +29,9 @@ class WaveformDatasetByWaveBYOL(Dataset):
             dataset.load_waveform(audio_file, self.sampling_rate),
             self.audio_window, fit=False)
 
-        pick01 = dataset.get_random_start_point(waveform01.shape[1], self.audio_window)
-        waveform01 = audio_io.random_cutoff(waveform01, self.audio_window, pick01)
-        pick02 = dataset.get_random_start_point(waveform02.shape[1], self.audio_window)
-        waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick02)
+        pick = dataset.get_random_start_point(waveform01.shape[1], self.audio_window)
+        waveform01 = audio_io.random_cutoff(waveform01, self.audio_window, pick)
+        waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick)
 
         if len(self.augmentation) != 0:
             waveform01 = audio_augmentation.audio_augmentation_pipeline(

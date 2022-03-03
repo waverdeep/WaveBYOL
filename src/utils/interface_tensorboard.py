@@ -65,30 +65,10 @@ def add_latent_heatmap(writer, data, title, desc, epoch):
     plt.close()
 
 
-def add_byol_latent_heatmap(writer, online1, online2, target1, target2, title, desc, epoch):
-    fig = plt.figure(figsize=(12, 12))
-    ax1 = fig.add_subplot(2, 2, 1)
-    ax1.matshow(online1)
-    ax2 = fig.add_subplot(2, 2, 2)
-    ax2.matshow(online2)
-    ax3 = fig.add_subplot(2, 2, 3)
-    ax3.matshow(target2)
-    ax4 = fig.add_subplot(2, 2, 4)
-    ax4.matshow(target1)
-    writer.add_figure('{}/{}'.format(title, desc), fig, epoch)
-    plt.close()
-
-
-def add_train_latent_heatmap(writer, online01, online02, target01, target02, title, desc, epoch):
+def add_latents_heatmap(writer, output, title, desc, step):
     fig, axes = plt.subplots(1, 4)
-    axes[0].matshow(online01, aspect='equal')  # , aspect='auto')
-    axes[1].matshow(online02, aspect='equal')  # , aspect='auto')
-    axes[2].matshow(target01, aspect='equal')  # , aspect='auto')
-    axes[3].matshow(target02, aspect='equal')  # , aspect='auto')
-    writer.add_figure('{}/{}'.format(title, desc), fig, epoch)
+    for i in range(4):
+        axes[i].matshow(output[i], aspect='equal')  # , aspect='auto')
+    writer.add_figure('{}/{}'.format(title, desc), fig, step)
     plt.close()
-
-
-
-
 

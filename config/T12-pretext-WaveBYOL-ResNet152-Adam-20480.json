@@ -1,9 +1,9 @@
 {
 	"use_cuda": true,
-	"audio_window": 15200,
+	"audio_window": 20480,
 	"sampling_rate": 16000,
 	"epoch": 100,
-	"batch_size": 512,
+	"batch_size": 64,
 	"learning_rate": 0.0003,
 
 	"train_type": "pretext",
@@ -24,19 +24,19 @@
 	"encoder_filter_size": [10, 8, 4, 2, 2],
 	"encoder_stride": [5, 4, 2, 2, 2],
 	"encoder_padding": [2, 2, 2, 2, 1],
-	"mlp_input_dim": 512,
+	"mlp_input_dim": 2048,
 	"mlp_hidden_dim": 4096,
 	"mlp_output_dim": 4096,
-	"feature_extractor_model": "resnet18",
+	"feature_extractor_model": "resnet152",
 	"feature_extractor_model_pretrain": true,
 	"ema_decay": 0.99,
-	"optimizer_name": "AdamP",
+	"optimizer_name": "Adam",
 	"weight_decay": 1.5e-6,
     "eps": 1e-3,
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
 	"pretext_checkpoint": null,
-	"tensorboard_writer_name": "./runs/T11-pretext-WaveBYOL-ResNet18-AdamP-15200",
-	"checkpoint_file_name": "T11-pretext-WaveBYOL-ResNet18-AdamP-15200"
+	"tensorboard_writer_name": "./runs/T12-pretext-WaveBYOL-ResNet152-Adam-20480",
+	"checkpoint_file_name": "T12-pretext-WaveBYOL-ResNet152-Adam-20480"
 }

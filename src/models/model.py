@@ -1,12 +1,13 @@
-import src.models.model_wavebyol_combine as model_wavebyol_combine
-import src.models.model_wavebyol_reconst as model_wavebyol_reconst
+import src.models.model_wavebyol_original as model_wavebyol_original
+import src.models.model_wavebyol as model_wavebyol
+import src.models.model_downstream as model_downstream
 import torch
 
 
 def load_model(config, model_name, checkpoint_path=None):
     model = None
-    if model_name == "WaveBYOLCombine":
-        model = model_wavebyol_combine.WaveBYOLCombine(
+    if model_name == "WaveBYOL":
+        model = model_wavebyol.WaveBYOL(
             config=config,
             encoder_input_dim=config['encoder_input_dim'],
             encoder_hidden_dim=config['encoder_hidden_dim'],
@@ -16,20 +17,14 @@ def load_model(config, model_name, checkpoint_path=None):
             mlp_input_dim=config['mlp_input_dim'],
             mlp_hidden_dim=config['mlp_hidden_dim'],
             mlp_output_dim=config['mlp_output_dim'],
-            combine_model_name=config['combine_model_name']
+            feature_extractor_model=config['feature_extractor_model'],
+            pretrain=config['feature_extractor_model_pretrain']
         )
-    elif model_name == "WaveBYOLReconst":
-        model = model_wavebyol_reconst.WaveBYOLCombine(
-            config=config,
-            encoder_input_dim=config['encoder_input_dim'],
-            encoder_hidden_dim=config['encoder_hidden_dim'],
-            encoder_filter_size=config['encoder_filter_size'],
-            encoder_stride=config['encoder_stride'],
-            encoder_padding=config['encoder_padding'],
-            decoder_output_padding=config['decoder_output_padding'],
-            mlp_input_dim=config['mlp_input_dim'],
-            mlp_hidden_dim=config['mlp_hidden_dim'],
-            mlp_output_dim=config['mlp_output_dim'],
+    elif model_name == "DownstreamClassification":
+        model = model_downstream.DownstreamClassification(
+            input_dim=config['downstream_input_dim'],
+            hidden_dim=config['downstream_hidden_dim'],
+            output_dim=config['downstream_output_dim'],
         )
 
     if checkpoint_path is not None:

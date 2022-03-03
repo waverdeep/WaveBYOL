@@ -8,12 +8,13 @@ from datetime import datetime
 import src.utils.interface_file_io as file_io
 
 
-def setup_seed(random_seed=777):
-    torch.manual_seed(random_seed)
-    # torch.backends.cudnn.deterministic = True # 연산 속도가 느려질 수 있음
+def setup_seed(seed=42):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    np.random.seed(random_seed)
-    random.seed(random_seed)
 
 
 def setup_timestamp():
