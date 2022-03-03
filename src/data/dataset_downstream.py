@@ -14,19 +14,15 @@ def get_label_dict(label_list):
         label_dict[str(key)] = idx
     return label_dict
 
-# def get_audio_file_with_acoustic_info(file_list, index):
-#     audio_file = dataset_baseline.get_audio_file(file_list, index)
-#     filename = audio_file.split('/')[5]
-#     acoustic_id = filename.split('-')[1]
-#     return audio_file, filename, acoustic_id
-
 
 def load_audio_with_label(file_list, index, dataset_name=None):
+    audio_file = dataset.get_audio_filename_path_with_index(file_list, index)
     if dataset_name == 'UrbanSound8K':
-        audio_file = dataset.get_audio_filename_path_with_index(file_list, index)
+        filename = audio_file.split('/')[5]
+        label = filename.split('-')[1]
+    else:
         temp = audio_file.split('/')
         label = temp[4]
-    else:
 
     return audio_file, label
 
