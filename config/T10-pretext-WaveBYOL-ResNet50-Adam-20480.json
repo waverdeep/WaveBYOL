@@ -37,6 +37,6 @@
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
 	"pretext_checkpoint": null,
-	"tensorboard_writer_name": "./runs/T10-pretext-WaveBYOL-ResNet50-Adam-20480",
-	"checkpoint_file_name": "T10-pretext-WaveBYOL-ResNet50-Adam-20480"
+	"tensorboard_writer_name": "./runs/T10-pretext-WaveBYOL-ResNet50-Adam-20480-SP",
+	"checkpoint_file_name": "T10-pretext-WaveBYOL-ResNet50-Adam-20480-SP"
 }

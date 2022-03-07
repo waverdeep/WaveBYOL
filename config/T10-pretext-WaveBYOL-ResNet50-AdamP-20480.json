@@ -1,9 +1,9 @@
 {
 	"use_cuda": true,
-	"audio_window": 15200,
+	"audio_window": 20480,
 	"sampling_rate": 16000,
 	"epoch": 100,
-	"batch_size": 256,
+	"batch_size": 128,
 	"learning_rate": 0.0003,
 
 	"train_type": "pretext",
@@ -37,6 +37,6 @@
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
 	"pretext_checkpoint": null,
-	"tensorboard_writer_name": "./runs/T10-pretext-WaveBYOL-ResNet50-AdamP-15200-SP",
-	"checkpoint_file_name": "T10-pretext-WaveBYOL-ResNet50-AdamP-15200-SP"
+	"tensorboard_writer_name": "./runs/T10-pretext-WaveBYOL-ResNet50-AdamP-20480-SP",
+	"checkpoint_file_name": "T10-pretext-WaveBYOL-ResNet50-AdamP-20480-SP"
 }
