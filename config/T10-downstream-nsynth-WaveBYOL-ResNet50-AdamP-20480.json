@@ -4,18 +4,18 @@
 	"sampling_rate": 16000,
 	"epoch": 200,
 	"batch_size": 256,
-	"learning_rate": 0.0003,
+	"learning_rate": 0.000005,
 	"train_type": "downstream",
-	"dataset_name": "Ravdess",
-	"train_dataset": "./dataset/ravdess-train.txt",
-	"test_dataset": "./dataset/ravdess-test.txt",
-	"label_file_path": "./dataset/ravdess-label.txt",
+	"dataset_name": "Nsynth",
+	"train_dataset": "./dataset/nsynth-train.txt",
+	"test_dataset": "./dataset/nsynth-test.txt",
+	"label_file_path": "./dataset/nsynth-label.txt",
 	"metadata": null,
 	"train_augmentation": [1, 2, 3, 4, 6],
 	"augmentation_count": 4,
 	"test_augmentation": [],
 
-	"num_workers": 16,
+	"num_workers": 8,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 
@@ -35,7 +35,7 @@
 	"downstream_model_name": "DownstreamClassification",
 	"downstream_input_dim": 2048,
 	"downstream_hidden_dim": 1024,
-	"downstream_output_dim": 8,
+	"downstream_output_dim": 11,
 	"loss_function": "CrossEntropyLoss",
 
 	"ema_decay": 0,
@@ -45,8 +45,8 @@
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
-	"pretext_checkpoint": "./checkpoint/T10-pretext-WaveBYOL-ResNet50-Adam-15200-SP/T10-pretext-WaveBYOL-ResNet50-Adam-15200-SP-model-best-2022_3_2_11_25_21-epoch-51.pt",
+	"pretext_checkpoint": "./checkpoint/T10-pretext-WaveBYOL-ResNet50-AdamP-20480-SP/T10-pretext-WaveBYOL-ResNet50-AdamP-20480-SP-model-best-2022_3_5_7_30_5-epoch-97.pt",
 	"downstream_checkpoint": null,
-	"tensorboard_writer_name": "./runs/T10-ravdess-WaveBYOL-ResNet50-Adam-15200",
-	"checkpoint_file_name": "T10-ravdess-WaveBYOL-ResNet50-Adam-15200"
+	"tensorboard_writer_name": "./runs/T10-nsynth-WaveBYOL-ResNet50-AdamP-20480",
+	"checkpoint_file_name": "T10-nsynth-WaveBYOL-ResNet50-AdamP-20480"
 }
