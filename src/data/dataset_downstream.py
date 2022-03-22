@@ -17,9 +17,17 @@ def get_label_dict(label_list):
 
 def load_audio_with_label(file_list, index, dataset_name=None):
     audio_file = dataset.get_audio_filename_path_with_index(file_list, index)
-    if dataset_name == 'UrbanSound8K':
+    if dataset_name == 'Urbansound8K':
         filename = audio_file.split('/')[5]
         label = filename.split('-')[1]
+    elif dataset_name == 'Nsynth':
+        temp = audio_file.split('/')
+        label = temp[4]
+        label = label.split('_')[0]
+    elif dataset_name == 'Ravdess':
+        temp = audio_file.split('/')
+        temp = temp[5]
+        label = temp.split('-')[2]
     else:
         temp = audio_file.split('/')
         label = temp[4]
