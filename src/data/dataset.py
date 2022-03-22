@@ -27,7 +27,7 @@ def get_dataloader(config, mode="train"):
     train_type = config['train_type']
     dataset = None
 
-    if "verification" in train_type:
+    if "pretext_verification" == train_type:
         dataset = dataset_wavebyol_verific.WaveformDatasetByWaveBYOLVerification01(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
@@ -35,6 +35,7 @@ def get_dataloader(config, mode="train"):
             augmentation=config['{}_augmentation'.format(mode)],
             augmentation_count=config['{}_augmentation_count'.format(mode)],
             randomness=config['randomness'],
+            normalize=config['normalize'],
             config=config
         )
     elif 'pretext' in train_type:
@@ -45,7 +46,15 @@ def get_dataloader(config, mode="train"):
             augmentation=config['{}_augmentation'.format(mode)],
             augmentation_count=config['augmentation_count']
         )
-    elif train_type == 'downstream':
+    elif 'pretext_u2' in train_type:
+        dataset = dataset_wavebyol.WaveformDatasetByWaveBYOL(
+            file_path=config['{}_dataset'.format(mode)],
+            audio_window=config['audio_window'],
+            sampling_rate=config['sampling_rate'],
+            augmentation=config['{}_augmentation'.format(mode)],
+            augmentation_count=config['augmentation_count']
+        )
+    elif 'downstream' in train_type:
         dataset = dataset_downstream.WaveformDataset(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
@@ -57,6 +66,7 @@ def get_dataloader(config, mode="train"):
             config=config,
             dataset_name=config['dataset_name'],
         )
+
 
 
     dataloader = data.DataLoader(
