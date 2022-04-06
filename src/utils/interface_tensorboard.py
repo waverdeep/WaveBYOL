@@ -2,6 +2,10 @@
 # 이 오류를 해결하기 위해서 작성해야 할 것
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import numpy as np
+
+
 # import tensorflow as tf
 import librosa
 import tensorboard as tb
@@ -69,6 +73,20 @@ def add_latents_heatmap(writer, output, title, desc, step):
     fig, axes = plt.subplots(1, 4)
     for i in range(4):
         axes[i].matshow(output[i], aspect='equal')  # , aspect='auto')
+    writer.add_figure('{}/{}'.format(title, desc), fig, step)
+    plt.close()
+
+
+def add_confusion_matrix(writer, title, desc, step, label_num, targets, predicts):
+    labels = np.arange(label_num)
+    output = confusion_matrix(targets, predicts, labels=labels)
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1, 1, 1)
+    ax1.matshow(output)
+    ax1.set_xticklabels([''] + labels)
+    ax1.set_yticklabels([''] + labels)
+
     writer.add_figure('{}/{}'.format(title, desc), fig, step)
     plt.close()
 
