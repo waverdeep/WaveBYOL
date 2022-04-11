@@ -17,7 +17,12 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def main():
     parser = argparse.ArgumentParser(description='waverdeep - WaveBYOL')
     parser.add_argument("--configuration", required=False,
-                        default='./config/T10-urbansound-WaveBYOL-ResNet50-Adam-15200.json')
+                        # default='./config_FTX/FT10-downstream-test.json')
+                        # default='./config_FTX/FT13-pretext-WaveBYOL-H4-AdamP-20480.json')
+                        default='./config_FT10/FT10-downstream-nsynth-WaveBYOL-H2-AdamP-20480.json')
+                        # default='./config_FTX/FT10-pretext-WaveBYOL-H2-AdamP-kspon-20480.json')
+                        # default='./config_FTX_TRNSFR/FT10-transfer-embedd-voxceleb-WaveBYOL-H2-Adam-20480.json')
+                        # default='./config_FTX_TRNSFR/FT10-transfer-iemocap-WaveBYOL-H2-Adam-20480.json')
     args = parser.parse_args()
     now = train_tool.setup_timestamp()
 
@@ -49,8 +54,18 @@ def main():
     print("model parameters: {}".format(pretext_model_params))
     print("{}".format(pretext_model))
 
+    if 'downstream_transfer' in config['train_type']:
+        print(">> load downstream transfer learning model ...")
+        downstream_model = model.load_model(config=config, model_name=config['downstream_model_name'],
+                                            checkpoint_path=config['downstream_checkpoint'], pretext_model=pretext_model)
 
-    if config['train_type'] == 'downstream':
+        downstream_model_params = sum(p.numel() for p in downstream_model.parameters() if p.requires_grad)
+        print("model parameters: {}".format(downstream_model_params))
+        print("{}".format(downstream_model_params))
+
+        label_dict = train_dataset.label_dict
+        print(">> label count: {}".format(len(label_dict.keys())))
+    elif 'downstream' in config['train_type']:
         print(">> load downstream model ...")
         downstream_model = model.load_model(config=config, model_name=config['downstream_model_name'],
                                             checkpoint_path=config['downstream_checkpoint'])
@@ -67,12 +82,13 @@ def main():
     model_optimizer = None
     if 'pretext' in config['train_type']:
         model_optimizer = optimizer.get_optimizer(pretext_model.parameters(), config)
-    elif config['train_type'] == 'downstream':
+    elif 'downstream' in config['train_type']:
+        print(">> load downstream optimizer")
         model_optimizer = optimizer.get_optimizer(downstream_model.parameters(), config)
 
     if config['use_cuda']:
         pretext_model = pretext_model.cuda()
-        if config['train_type'] == 'downstream':
+        if 'downstream' in config['train_type']:
             downstream_model = downstream_model.cuda()
 
     print(">> set tensorboard ...")
@@ -80,6 +96,7 @@ def main():
 
     print(">> start train/test ...")
     best_loss = None
+    early_stop = 0
     epoch = config['epoch']
     for count in range(epoch):
         count = count + 1
@@ -88,7 +105,12 @@ def main():
             train_loss = trainer.train_pretext(
                 config=config, pretext_model=pretext_model, pretext_dataloader=train_loader,
                 pretext_optimizer=model_optimizer, writer=writer, epoch=count)
-        elif config['train_type'] == 'downstream':
+        elif 'downstream_transfer' in config['train_type']:
+            train_loss = trainer.train_downstream_transfer(
+                config=config, downstream_model=downstream_model,
+                downstream_dataloader=train_loader, downstream_criterion=loss.set_criterion(config['loss_function']),
+                downstream_optimizer=model_optimizer, writer=writer, epoch=count, label_dict=label_dict)
+        elif 'downstream' in config['train_type']:
             train_loss = trainer.train_downstream(
                 config=config, pretext_model=pretext_model, downstream_model=downstream_model,
                 downstream_dataloader=train_loader, downstream_criterion=loss.set_criterion(config['loss_function']),
@@ -99,7 +121,12 @@ def main():
             test_loss = tester.test_pretext(
                 config=config, pretext_model=pretext_model,
                 pretext_dataloader=test_loader, writer=writer, epoch=count)
-        elif config['train_type'] == 'downstream':
+        elif 'downstream_transfer' in config['train_type']:
+            test_loss = tester.test_downstream_transfer(
+                config=config, downstream_model=downstream_model,
+                downstream_dataloader=test_loader, downstream_criterion=loss.set_criterion(config['loss_function']),
+                writer=writer, epoch=count, label_dict=label_dict)
+        elif 'downstream' in config['train_type']:
             test_loss = tester.test_downstream(
                 config=config, pretext_model=pretext_model, downstream_model=downstream_model,
                 downstream_dataloader=test_loader, downstream_criterion=loss.set_criterion(config['loss_function']),
@@ -110,10 +137,30 @@ def main():
         elif test_loss < best_loss:
             best_loss = test_loss
             best_epoch = count
-            train_tool.save_checkpoint(config=config, model=pretext_model, optimizer=pretext_model,
+            early_stop = 0
+
+
+            if downstream_model is not None:
+                train_tool.save_checkpoint(config=config, model=downstream_model, optimizer=model_optimizer,
+                                           loss=test_loss, epoch=best_epoch, mode="best-ds",
+                                           date='{}'.format(now))
+
+                print("save downstream checkpoint")
+            train_tool.save_checkpoint(config=config, model=pretext_model, optimizer=model_optimizer,
                                        loss=test_loss, epoch=best_epoch, mode="best",
                                        date='{}'.format(now))
+            print("save pretext checkpoint")
+
             print("save checkpoint at {} epoch...".format(count))
+        else:
+            if downstream_model is not None:
+                if test_loss > best_loss:
+                    early_stop += 1
+                    print(">> count early stop: {}".format(early_stop))
+
+        if early_stop > 9:
+            print(">> early stopped... ")
+            exit(0)
 
     tensorboard.close_tensorboard_writer(writer)
 

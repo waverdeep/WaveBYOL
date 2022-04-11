@@ -46,8 +46,8 @@ class SelectableAudioAugment:
     def noise_generator(self):
         pick = np.random.randint(len(self.noise_filelist))
         waveform, _ = audio_io.audio_loader(self.noise_filelist[pick][4:])
-        waveform = audio_io.audio_adjust_length(waveform, self.sample_rate)
-        waveform = audio_io.random_cutoff(waveform, self.sample_rate)
+        waveform = audio_io.audio_adjust_length(waveform, self.audio_window)
+        waveform = audio_io.random_cutoff(waveform, self.audio_window)
         return waveform
 
     def additive_noise(self, x):
@@ -62,7 +62,7 @@ class SelectableAudioAugment:
         return y
 
     def audio_speed(self, x):
-        speed = np.random.randint(int(min*100), 99) / 100
+        speed = np.random.randint(int(self.min_audio_speed*100), 99) / 100
         effects = [['speed', str(speed)]]
         y, _ = torchaudio.sox_effects.apply_effects_tensor(x, self.sample_rate, effects)
         return y

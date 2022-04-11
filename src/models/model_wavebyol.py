@@ -4,7 +4,7 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
 def set_requires_grad(model, requires):
@@ -51,6 +51,30 @@ def select_feature_extractor_model(model_name, pretrain=True):
                 torchvision.models.resnet50(pretrained=pretrain).layer4,
             )
         )
+    elif model_name == "resnet50_term01":
+        feature_extractor_model.add_module(
+            "feature_extractor_layer",
+            nn.Sequential(
+                torchvision.models.resnet50(pretrained=pretrain).conv1,
+                torchvision.models.resnet50(pretrained=pretrain).bn1,
+                torchvision.models.resnet50(pretrained=pretrain).relu,
+                torchvision.models.resnet50(pretrained=pretrain).layer1,
+                torchvision.models.resnet50(pretrained=pretrain).layer2,
+            )
+        )
+    elif model_name == "resnet50_term02":
+        feature_extractor_model.add_module(
+            "feature_extractor_layer",
+            nn.Sequential(
+                torchvision.models.resnet50(pretrained=pretrain).conv1,
+                torchvision.models.resnet50(pretrained=pretrain).bn1,
+                torchvision.models.resnet50(pretrained=pretrain).relu,
+                torchvision.models.resnet50(pretrained=pretrain).layer1,
+                torchvision.models.resnet50(pretrained=pretrain).layer2,
+                torchvision.models.resnet50(pretrained=pretrain).layer3,
+                torchvision.models.resnet50(pretrained=pretrain).layer4,
+            )
+        )
     elif model_name == 'resnet152':
         feature_extractor_model.add_module(
             "feature_extractor_layer",
@@ -63,6 +87,17 @@ def select_feature_extractor_model(model_name, pretrain=True):
                 torchvision.models.resnet152(pretrained=pretrain).layer2,
                 torchvision.models.resnet152(pretrained=pretrain).layer3,
                 torchvision.models.resnet152(pretrained=pretrain).layer4,
+            )
+        )
+    elif model_name == 'resnet152_term01':
+        feature_extractor_model.add_module(
+            "feature_extractor_layer",
+            nn.Sequential(
+                torchvision.models.resnet152(pretrained=pretrain).conv1,
+                torchvision.models.resnet152(pretrained=pretrain).bn1,
+                torchvision.models.resnet152(pretrained=pretrain).relu,
+                torchvision.models.resnet152(pretrained=pretrain).layer1,
+                torchvision.models.resnet152(pretrained=pretrain).layer2,
             )
         )
     elif model_name == 'resnet18':
@@ -79,11 +114,31 @@ def select_feature_extractor_model(model_name, pretrain=True):
                 torchvision.models.resnet18(pretrained=pretrain).layer4,
             )
         )
+    elif model_name == 'resnet18_term01':
+        feature_extractor_model.add_module(
+            "feature_extractor_layer",
+            nn.Sequential(
+                torchvision.models.resnet18(pretrained=pretrain).conv1,
+                torchvision.models.resnet18(pretrained=pretrain).bn1,
+                torchvision.models.resnet18(pretrained=pretrain).relu,
+                torchvision.models.resnet18(pretrained=pretrain).layer1,
+                torchvision.models.resnet18(pretrained=pretrain).layer2,
+                torchvision.models.resnet18(pretrained=pretrain).layer3,
+                torchvision.models.resnet18(pretrained=pretrain).layer4,
+            )
+        )
     elif model_name == 'mobilenetv2':
         feature_extractor_model.add_module(
             "feature_extractor_layer",
             nn.Sequential(
                 torchvision.models.mobilenet_v2(pretrained=pretrain).features
+            )
+        )
+    elif model_name == 'mobilenetv3_small':
+        feature_extractor_model.add_module(
+            "feature_extractor_layer",
+            nn.Sequential(
+                torchvision.models.mobilenet_v3_small(pretrained=pretrain).features
             )
         )
     elif model_name == 'mobilenetv3_large':
@@ -145,6 +200,7 @@ class Encoder(nn.Module):
                 nn.Sequential(
                     nn.Conv1d(in_channels=input_dim, out_channels=hidden_dim,
                               kernel_size=filter_size, stride=stride, padding=padding),
+                    nn.BatchNorm1d(hidden_dim),
                     nn.ReLU(),
                 )
             )
@@ -160,6 +216,7 @@ class Encoder(nn.Module):
         # normalize 먼저 진행 (batch 단위로)
         out = F.normalize(x, dim=-1, p=4)
         out = self.encoder(out)
+        # print(out.size())
 
         # chunk and stack layer
         chunks = out.chunk(3, dim=1)
@@ -178,7 +235,7 @@ class Encoder(nn.Module):
 
         out_merge = out01 + out02
 
-        return out_merge, out_feature
+        return out_merge, [out_feature,out]
 
 
 class WaveBYOL(nn.Module):
@@ -228,6 +285,12 @@ class WaveBYOL(nn.Module):
 
     def get_representation(self, x):
         online, online_rep = self.online_encoder_network(x)
+        #online01_project = self.online_projector_network(online)
+        return online_rep# online_rep
+
+    def get_early_representation(self, x):
+        out = F.normalize(x, dim=-1, p=4)
+        online_rep = self.online_encoder_network.encoder(out)
         return online_rep
 
     def forward(self, waveform01, waveform02):
@@ -253,7 +316,7 @@ class WaveBYOL(nn.Module):
         loss = loss01 + loss02
 
         return loss.mean(), [online01_representation, online02_representation,
-                             target01_representation.detach(), target02_representation.detach()]
+                             target01_representation, target02_representation]
 
 
 if __name__ == '__main__':
@@ -261,6 +324,9 @@ if __name__ == '__main__':
         config={"ema_decay":0.99},
         encoder_input_dim=1,
         encoder_hidden_dim=513,
+        # encoder_filter_size=[10, 3, 3, 3, 3, 2, 2],
+        # encoder_stride=[5, 2, 2, 2, 2, 2, 2],
+        # encoder_padding=[2, 2, 2, 2, 2, 2, 1],
         encoder_filter_size=[10, 8, 4, 2, 2],
         encoder_stride=[5, 4, 2, 2, 2],
         encoder_padding=[2, 2, 2, 2, 1],
@@ -271,13 +337,15 @@ if __name__ == '__main__':
         pretrain=True
     ).cuda()
 
-    test_data = torch.rand(2, 1, 15200).cuda()
-
+    test_data = torch.rand(2, 1, 20480).cuda()
     out_loss, _ = test_model(test_data, test_data)
+    pretext_model_params = sum(p.numel() for p in test_model.parameters() if p.requires_grad)
+    print("model parameters: {}".format(pretext_model_params))
     print(out_loss)
-    print(_[0].size())
+    # print(_[0].size())
     output = test_model.get_representation(test_data)
-    print(output.size())
+    print(output[0].size())
+    print(output[1].size())
 
 
 

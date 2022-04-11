@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 def main():
-    dataset_path = '../../dataset/ravdess'
+    dataset_path = '../../dataset/IEMOCAP_full_release'
     file_list = file_io.get_all_file_path(dataset_path, 'wav')
 
     total_length = 0

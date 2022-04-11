@@ -80,12 +80,16 @@ def add_latents_heatmap(writer, output, title, desc, step):
 def add_confusion_matrix(writer, title, desc, step, label_num, targets, predicts):
     labels = np.arange(label_num)
     output = confusion_matrix(targets, predicts, labels=labels)
+    norm_output = output / output.astype(np.float).sum(axis=1)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(1, 1, 1)
-    ax1.matshow(output)
-    ax1.set_xticklabels([''] + labels)
-    ax1.set_yticklabels([''] + labels)
+    ax1.matshow(norm_output)
+    xaxis = np.arange(len(labels))
+    ax1.set_xticks(xaxis)
+    ax1.set_yticks(xaxis)
+    ax1.set_xticklabels(labels)
+    ax1.set_yticklabels(labels)
 
     writer.add_figure('{}/{}'.format(title, desc), fig, step)
     plt.close()

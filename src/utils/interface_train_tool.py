@@ -40,6 +40,9 @@ def save_checkpoint(config, model, optimizer, loss, epoch, mode="best", date="")
     if mode == "best":
         file_path = os.path.join(base_directory,
                                  config['checkpoint_file_name'] + "-model-best-{}-epoch-{}.pt".format(date, epoch))
+    elif mode == "best-ds":
+        file_path = os.path.join(base_directory,
+                                 config['checkpoint_file_name'] + "-model-best-ds-{}-epoch-{}.pt".format(date, epoch))
     elif mode == 'step':
         file_path = os.path.join(base_directory,
                                  config['checkpoint_file_name'] + "-model-{}-epoch-{}.pt".format(date, epoch))

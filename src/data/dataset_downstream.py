@@ -3,6 +3,7 @@ import src.utils.interface_file_io as file_io
 import src.utils.interface_audio_io as audio_io
 import src.utils.interface_audio_augmentation as audio_augmentation
 from src.data import dataset as dataset
+import torch.nn.functional as F
 import random
 import natsort
 import pandas as pd
@@ -28,9 +29,24 @@ def load_audio_with_label(file_list, index, dataset_name=None):
         temp = audio_file.split('/')
         temp = temp[5]
         label = temp.split('-')[2]
-    else:
+    elif dataset_name == 'voxlingua107':
+        temp = audio_file.split('/')
+        label = temp[3]
+    elif dataset_name == 'esc-50':
+        temp = audio_file.split('/')[4]
+        temp = temp.split('.')[0]
+        label = temp.split('-')[3]
+    elif dataset_name == 'iemocap':
+        audio_file, label = audio_file.split(' ')
+    elif dataset_name == 'Voxceleb':
         temp = audio_file.split('/')
         label = temp[4]
+    elif dataset_name == 'Voxforge':
+        temp = audio_file.split('/')
+        label = temp[4]
+    else:
+        temp = audio_file.split('/')
+        label = temp[3]
 
     return audio_file, label
 
@@ -65,6 +81,7 @@ class WaveformDataset(Dataset):
         audio_file, label = load_audio_with_label(self.file_list, index, self.dataset_name)
         waveform = audio_io.audio_adjust_length(
             dataset.load_waveform(audio_file, self.sampling_rate), self.audio_window, fit=False)
+
 
         pick = dataset.get_random_start_point(waveform.shape[1], self.audio_window)
         waveform = audio_io.random_cutoff(waveform, self.audio_window, pick)

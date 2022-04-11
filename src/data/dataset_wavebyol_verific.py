@@ -6,12 +6,12 @@ import src.utils.interface_audio_augmentation_verific as audio_augmentation_veri
 import src.data.dataset_wavebyol as dataset_wavebyol
 from src.data import dataset as dataset
 import random
+import torch.nn.functional as F
 
 
-# 1, 2, 3, 4, 5, 6 -> 이거 다 박고 들어가면 어떨까
 class WaveformDatasetByWaveBYOLVerification01(Dataset):
     def __init__(self, file_path, audio_window=20480, sampling_rate=16000, augmentation=None, augmentation_count=5,
-                 randomness=True, config=None):
+                 randomness=True, config=None, normalize=False):
         super(WaveformDatasetByWaveBYOLVerification01, self).__init__()
         self.file_path = file_path
         self.audio_window = audio_window
@@ -21,6 +21,7 @@ class WaveformDatasetByWaveBYOLVerification01(Dataset):
         self.randomness = randomness
         self.file_list = file_io.read_txt2list(self.file_path)
         self.config = config
+        self.normalize = normalize
         self.selectable_audio_augmentation = audio_augmentation_verific.SelectableAudioAugment(
             audio_window=self.audio_window,
             sample_rate=self.sampling_rate,
@@ -55,4 +56,9 @@ class WaveformDatasetByWaveBYOLVerification01(Dataset):
                 waveform01, random.sample(self.augmentation, self.augmentation_count), self.randomness)
             waveform02 = self.selectable_audio_augmentation.get_augmented_audio(
                 waveform02, random.sample(self.augmentation, self.augmentation_count), self.randomness)
+
+        if self.normalize:
+            waveform01 = F.normalize(waveform01, dim=-1, p=2)
+            waveform02 = F.normalize(waveform02, dim=-1, p=2)
+
         return waveform01, waveform02

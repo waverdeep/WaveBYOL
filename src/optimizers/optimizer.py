@@ -13,10 +13,10 @@ def get_optimizer(model_parameter, config):
     elif optimizer_name == 'SGD':
         return optimizer.SGD(params=model_parameter,
                              lr=config['learning_rate'],
-                             momentum=config['momentum'],
-                             dampening=config['dampening'],
-                             weight_decay=config['weight_decay'],
-                             nesterov=config['nesterov'])
+                             # momentum=config['momentum'],
+                             # dampening=config['dampening'],
+                             weight_decay=config['weight_decay'],)
+                             # nesterov=config['nesterov'])
     elif optimizer_name == 'AdamP':
         return AdamP(model_parameter,
                      lr=config['learning_rate'],

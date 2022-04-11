@@ -34,13 +34,16 @@ class WaveformDatasetByWaveBYOL(Dataset):
         waveform02 = audio_io.random_cutoff(waveform02, self.audio_window, pick)
 
         if len(self.augmentation) != 0:
+            sample01 = random.sample(self.augmentation, random.randint(2, self.augmentation_count)) + [5]
+            sample02 = random.sample(self.augmentation, random.randint(2, self.augmentation_count)) + [5]
+
             waveform01 = audio_augmentation.audio_augmentation_pipeline(
                 waveform01, self.sampling_rate, self.audio_window,
-                random.sample(self.augmentation, random.randint(1, self.augmentation_count)),
+                sample01,
                 fix_audio_length=True)
             waveform02 = audio_augmentation.audio_augmentation_pipeline(
                 waveform02, self.sampling_rate, self.audio_window,
-                random.sample(self.augmentation, random.randint(1, self.augmentation_count)),
+                sample02,
                 fix_audio_length=True)
 
         return waveform01, waveform02

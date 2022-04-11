@@ -17,7 +17,7 @@ def audio_loader(audio_file):
 
 
 def cutoff(waveform, sample_rate, start, end):
-    cut = waveform[0][int(start*sample_rate): int(end*sample_rate)]
+    cut = waveform[0][int(start*sample_rate): int(end*sample_rate+1)]
     return cut.unsqueeze(0)
 
 
