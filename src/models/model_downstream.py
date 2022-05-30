@@ -21,11 +21,6 @@ class DownstreamClassification(nn.Module):
                     ('bn01', nn.BatchNorm1d(hidden_dim)),
                     ('act01', nn.ReLU()),
                     ('linear02', nn.Linear(hidden_dim, output_dim)),
-
-                    # ('linear03', nn.Linear(hidden_dim, hidden_dim)),
-                    # ('bn03', nn.BatchNorm1d(hidden_dim)),
-                    # ('act03', nn.ReLU()),
-                    # ('linear04', nn.Linear(hidden_dim, output_dim))
                 ]
             )
         )
@@ -79,7 +74,6 @@ class DownstreamEarlyClassification(nn.Module):
 
         out_merge = out01 + out02
         out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
 
         output = self.classifier(out_merge)
         return output
@@ -129,7 +123,6 @@ class DownstreamFlatClassification(nn.Module):
 
         out_merge = out01 + out02
         out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
 
         output = self.classifier(out_merge)
         return output
@@ -180,14 +173,11 @@ class DownstreamFlatEmbeddingClassification(nn.Module):
 
         out_merge = out01 + out02
         out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
-
         embedding = self.embedding(out_merge)
         return embedding
 
     def forward(self, x):
         out_x = self.embedding(x)
-        print(out_x.size())
         out01 = self.average_pooling(out_x)
         B, T, C, D = out01.shape
         out01 = out01.reshape((B, T * C * D))
@@ -198,67 +188,9 @@ class DownstreamFlatEmbeddingClassification(nn.Module):
 
         out_merge = out01 + out02
         out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
 
         embedding = self.embedding(out_merge)
         output = self.classifier(embedding)
-        return output
-
-
-class DownstreamFullFlatClassification(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
-        super(DownstreamFullFlatClassification, self).__init__()
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
-
-        self.flatten_layer = nn.Flatten()
-
-        self.classifier = nn.Sequential(
-            collections.OrderedDict(
-                [
-                    ('linear01', nn.Linear(input_dim, hidden_dim)),
-                    ('bn01', nn.BatchNorm1d(hidden_dim)),
-                    ('act01', nn.ReLU()),
-                    ('linear02', nn.Linear(hidden_dim, output_dim)),
-                ]
-            )
-        )
-
-    def forward(self, x):
-        out_merge = self.flatten_layer(x)
-        out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
-
-        output = self.classifier(out_merge)
-        return output
-
-
-class DownstreamU3Classification(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
-        super(DownstreamU3Classification, self).__init__()
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
-
-        self.classifier = nn.Sequential(
-            collections.OrderedDict(
-                [
-                    ('linear01', nn.Linear(input_dim, hidden_dim)),
-                    ('bn01', nn.BatchNorm1d(hidden_dim)),
-                    ('act01', nn.ReLU()),
-                    ('linear02', nn.Linear(hidden_dim, output_dim)),
-
-                    # ('linear03', nn.Linear(hidden_dim, hidden_dim)),
-                    # ('bn03', nn.BatchNorm1d(hidden_dim)),
-                    # ('act03', nn.ReLU()),
-                    # ('linear04', nn.Linear(hidden_dim, output_dim))
-                ]
-            )
-        )
-
-    def forward(self, x):
-        output = self.classifier(x)
         return output
 
 
@@ -286,21 +218,15 @@ class DownstreamFlatTransferClassification(nn.Module):
         )
 
     def forward(self, x):
-
         out, _ = self.pretext_model.get_representation(x)
-
         out01 = self.average_pooling(out)
         B, T, C, D = out01.shape
         out01 = out01.reshape((B, T * C * D))
-
         out02 = self.max_pooling(out)
         B, T, C, D = out02.shape
         out02 = out02.reshape((B, T * C * D))
-
         out_merge = out01 + out02
         out_merge = F.normalize(out_merge, dim=-1, p=2)
-        # print(out_merge.size())
-
         output = self.classifier(out_merge)
         return output, out
 
