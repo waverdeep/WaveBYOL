@@ -7,14 +7,14 @@
 	"learning_rate": 0.0001,
 
 	"train_type": "pretext",
-	"dataset_name": "kspon",
-	"train_dataset": "./dataset/kspon-train.txt",
-	"test_dataset": "./dataset/kspon-test.txt",
-	"train_augmentation": [1, 2, 3, 4, 5, 6],
-	"augmentation_count": 6,
+	"dataset_name": "FSD50K",
+	"train_dataset": "./dataset/FSD50K.dev_audio_16k.txt",
+	"test_dataset": "./dataset/FSD50K.eval_audio_16k.txt",
+	"train_augmentation": [1, 2, 3, 4, 6],
+	"augmentation_count": 5,
 	"test_augmentation": [],
 
-	"num_workers": 10,
+	"num_workers": 6,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 
@@ -37,6 +37,6 @@
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
 	"pretext_checkpoint": null,
-	"tensorboard_writer_name": "./runs/FT10-pretext-WaveBYOL-H2-AdamP-kspon-20480",
-	"checkpoint_file_name": "FT10-pretext-WaveBYOL-H2-AdamP-kspon-20480"
+	"tensorboard_writer_name": "./runs/FT10-pretext-WaveBYOL-H2-AdamP-12346-20480",
+	"checkpoint_file_name": "FT10-pretext-WaveBYOL-H2-AdamP-12346-20480"
 }

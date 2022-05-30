@@ -3,19 +3,19 @@
 	"audio_window": 64000,
 	"sampling_rate": 16000,
 	"epoch": 200,
-	"batch_size": 32,
-	"learning_rate": 0.00001,
-	"train_type": "downstream_transfer",
-	"dataset_name": "Voxceleb",
-	"train_dataset": "./dataset/voxceleb01-SI-train.txt",
-	"test_dataset": "./dataset/voxceleb01-SI-test.txt",
-	"label_file_path": "./dataset/voxceleb01-SI-label.txt",
+	"batch_size": 128,
+	"learning_rate": 0.0008,
+	"train_type": "downstream",
+	"dataset_name": "Nsynth",
+	"train_dataset": "./dataset/nsynth-train.txt",
+	"test_dataset": "./dataset/nsynth-test.txt",
+	"label_file_path": "./dataset/nsynth-label.txt",
 	"metadata": null,
 	"train_augmentation": [1, 2, 3, 4, 6],
 	"augmentation_count": 5,
 	"test_augmentation": [],
 
-	"num_workers": 6,
+	"num_workers": 4,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 
@@ -31,10 +31,10 @@
 	"feature_extractor_model": "h2",
 	"feature_extractor_model_pretrain": true,
 
-	"downstream_model_name": "DownstreamFlatTransferClassification",
+	"downstream_model_name": "DownstreamFlatClassification",
 	"downstream_input_dim": 10240,
 	"downstream_hidden_dim": 4096,
-	"downstream_output_dim": 1251,
+	"downstream_output_dim": 11,
 	"loss_function": "CrossEntropyLoss",
 
 	"ema_decay": 0,
@@ -44,8 +44,8 @@
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
-	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
-	"downstream_checkpoint": "./checkpoint/FT10-tranasfer-voxceleb-WaveBYOL-H2-AdamP-20480-model-best-ds-2022_5_9_8_56_37-epoch-47.pt",
-	"tensorboard_writer_name": "./runs/FT10-tranasfer-voxceleb-WaveBYOL-H2-AdamP-20480",
-	"checkpoint_file_name": "FT10-tranasfer-voxceleb-WaveBYOL-H2-AdamP-20480"
+	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-12346-20480-model-best-2022_4_27_11_56_5-epoch-99.pt",
+	"downstream_checkpoint": null,
+	"tensorboard_writer_name": "./runs/FT10-nsynth-WaveBYOL-H2-AdamP-12346-20480",
+	"checkpoint_file_name": "FT10-nsynth-WaveBYOL-H2-AdamP-12346-20480"
 }

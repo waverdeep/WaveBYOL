@@ -3,7 +3,7 @@
 	"audio_window": 64000,
 	"sampling_rate": 16000,
 	"epoch": 200,
-	"batch_size": 16,
+	"batch_size": 64,
 	"learning_rate": 0.00001,
 	"train_type": "downstream_transfer",
 	"dataset_name": "Urbansound8K",

@@ -3,7 +3,7 @@
 	"audio_window": 92800,
 	"sampling_rate": 16000,
 	"epoch": 200,
-	"batch_size": 16,
+	"batch_size": 32,
 	"learning_rate": 0.00001,
 	"train_type": "downstream_transfer",
 	"dataset_name": "Voxforge",
@@ -15,7 +15,7 @@
 	"augmentation_count": 5,
 	"test_augmentation": [],
 
-	"num_workers": 10,
+	"num_workers": 6,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 
@@ -38,14 +38,14 @@
 	"loss_function": "CrossEntropyLoss",
 
 	"ema_decay": 0,
-	"optimizer_name": "Adam",
+	"optimizer_name": "AdamP",
 	"weight_decay": 1.5e-6,
     "eps": 1e-3,
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
-	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
-	"downstream_checkpoint": null,
-	"tensorboard_writer_name": "./runs/FT10-tranasfer-voxforge-WaveBYOL-H2-Adam-20480",
-	"checkpoint_file_name": "FT10-tranasfer-voxforge-WaveBYOL-H2-Adam-20480"
+	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
+	"downstream_checkpoint": "./checkpoint/FT10-tranasfer-voxforge-WaveBYOL-H2-AdamP-20480-model-best-ds-2022_5_9_8_57_8-epoch-23.pt",
+	"tensorboard_writer_name": "./runs/FT10-tranasfer-voxforge-WaveBYOL-H2-AdamP-20480",
+	"checkpoint_file_name": "FT10-tranasfer-voxforge-WaveBYOL-H2-AdamP-20480"
 }

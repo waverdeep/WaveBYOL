@@ -44,8 +44,8 @@
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
-	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
+	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
 	"downstream_checkpoint": null,
-	"tensorboard_writer_name": "./runs/FT10-esc-50-WaveBYOL-H2-Adam-20480",
-	"checkpoint_file_name": "FT10-esc-50-WaveBYOL-H2-Adam-20480"
+	"tensorboard_writer_name": "./runs/FT10-esc-50-WaveBYOL-H2-AdamP-20480",
+	"checkpoint_file_name": "FT10-esc-50-WaveBYOL-H2-AdamP-20480"
 }

@@ -1,21 +1,21 @@
 {
 	"use_cuda": true,
-	"audio_window": 80000,
+	"audio_window": 92800,
 	"sampling_rate": 16000,
 	"epoch": 200,
-	"batch_size": 64,
-	"learning_rate": 0.00001,
-	"train_type": "downstream_transfer",
-	"dataset_name": "esc-50",
-	"train_dataset": "./dataset/esc-50-new-train.txt",
-	"test_dataset": "./dataset/esc-50-new-test.txt",
-	"label_file_path": "./dataset/esc-50-label.txt",
+	"batch_size": 128,
+	"learning_rate": 0.0008,
+	"train_type": "downstream",
+	"dataset_name": "Voxforge",
+	"train_dataset": "./dataset/voxforge-new-train.txt",
+	"test_dataset": "./dataset/voxforge-new-test.txt",
+	"label_file_path": "./dataset/voxforge-label.txt",
 	"metadata": null,
 	"train_augmentation": [1, 2, 3, 4, 6],
 	"augmentation_count": 5,
 	"test_augmentation": [],
 
-	"num_workers": 8,
+	"num_workers": 6,
 	"dataset_shuffle": true,
 	"pin_memory": false,
 
@@ -31,10 +31,10 @@
 	"feature_extractor_model": "h2",
 	"feature_extractor_model_pretrain": true,
 
-	"downstream_model_name": "DownstreamFlatTransferClassification",
+	"downstream_model_name": "DownstreamFlatClassification",
 	"downstream_input_dim": 10240,
 	"downstream_hidden_dim": 4096,
-	"downstream_output_dim": 50,
+	"downstream_output_dim": 6,
 	"loss_function": "CrossEntropyLoss",
 
 	"ema_decay": 0,
@@ -44,8 +44,8 @@
     "amsgrad": false,
     "betas": [0.9, 0.999],
 	"checkpoint_save_directory_path": "./checkpoint",
-	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
+	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-12456-20480/FT10-pretext-WaveBYOL-H2-AdamP-12456-20480-model-best-2022_4_20_13_7_19-epoch-90.pt",
 	"downstream_checkpoint": null,
-	"tensorboard_writer_name": "./runs/FT10-tranasfer-esc-50-WaveBYOL-H2-Adam-20480",
-	"checkpoint_file_name": "FT10-tranasfer-esc-50-WaveBYOL-H2-Adam-20480"
+	"tensorboard_writer_name": "./runs/FT10-voxforge-WaveBYOL-H2-Adam-12456-20480",
+	"checkpoint_file_name": "FT10-voxforge-WaveBYOL-H2-Adam-12456-20480"
 }
