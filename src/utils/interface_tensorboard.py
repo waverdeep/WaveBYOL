@@ -3,7 +3,11 @@
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+import src.utils.interface_file_io as file_io
 import numpy as np
+import os
+import json
 
 
 # import tensorflow as tf
@@ -94,3 +98,64 @@ def add_confusion_matrix(writer, title, desc, step, label_num, targets, predicts
     writer.add_figure('{}/{}'.format(title, desc), fig, step)
     plt.close()
 
+
+def add_classification_matrix(config, epoch, writer, title, desc,step, label_num, targets, predicts):
+    labels = list(map(str, list(np.arange(label_num))))
+    out = classification_report(targets, predicts, target_names=labels, output_dict=True)
+    base_directory = os.path.join(config['checkpoint_save_directory_path'], config['checkpoint_file_name'])
+    file_path = os.path.join(base_directory,
+                             config['checkpoint_file_name'] + "-model-best-epoch-{}-clf.json".format(epoch))
+    if not os.path.exists(os.path.join(config['checkpoint_save_directory_path'], config['checkpoint_file_name'])):
+        file_io.make_directory(os.path.join(config['checkpoint_save_directory_path'], config['checkpoint_file_name']))
+    with open(file_path, 'w') as f:
+        json.dump(out, f)
+
+    x1 = np.arange(1, label_num * 2, 2)
+    x2 = x1 + 0.5
+    x3 = x1 + 1
+
+    precision_value = []
+    recall_value = []
+    f1_value = []
+
+    for data in labels:
+        precision_value.append(out[data]['precision'])
+        recall_value.append(out[data]['recall'])
+        f1_value.append(out[data]['f1-score'])
+
+    fig = plt.figure()
+    plt.bar(x1, precision_value, color='r', width=0.5, label='precision')
+    plt.bar(x2, recall_value, color='g', width=0.5, label='recall')
+    plt.bar(x3, f1_value, color='b', width=0.5, label='fl-score')
+    plt.xticks(x2, labels)
+    plt.legend()
+
+    writer.add_figure('{}/{}'.format(title, desc), fig, step)
+    plt.close()
+
+def add_classification_avg_matrix(writer, title, desc, step, label_num, targets, predicts):
+    labels = np.arange(label_num)
+    term_labels = ['macro avg', 'weighted avg']
+    out = classification_report(targets, predicts, target_names=labels, output_dict=True)
+
+    x1 = [1, 3]
+    x2 = [1.5, 3.5]
+    x3 = [2, 4]
+
+    precision_value = []
+    recall_value = []
+    f1_value = []
+    for data in term_labels:
+        precision_value.append(out[data]['precision'])
+        recall_value.append(out[data]['recall'])
+        f1_value.append(out[data]['f1-score'])
+
+    fig = plt.figure()
+    plt.bar(x1, precision_value, color='r', width=0.5, label='precision')
+    plt.bar(x2, recall_value, color='g', width=0.5, label='recall')
+    plt.bar(x3, f1_value, color='b', width=0.5, label='fl-score')
+    plt.xticks(x2, term_labels)
+    plt.legend()
+
+    writer.add_figure('{}/{}'.format(title, desc), fig, step)
+    plt.close()

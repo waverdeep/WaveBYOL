@@ -30,7 +30,7 @@ def get_baseline_audio_list(directory_path, original_filepath, new_filepath):
 
 
 if __name__ == '__main__':
-    name = "voxforge"
+    name = "kspon"
     if name == "custom_dataset":
         train_directory_path = ['../../dataset/LibriSpeech/train-clean-100', '../../dataset/LibriSpeech/train-clean-360',
                                 '../../dataset/LibriSpeech/train-other-500']
@@ -58,10 +58,10 @@ if __name__ == '__main__':
                           '../../dataset/kspon/KsponSpeech_03',
                           '../../dataset/kspon/KsponSpeech_04',
                           '../../dataset/kspon/KsponSpeech_05',]
-        get_audio_list(directory_path, '../../dataset/kspon-train-20480.txt', audio_window=20480, file_extension="wav")
+        get_audio_list(directory_path, '../../dataset/kspon-train.txt', audio_window=20480, file_extension="wav")
         directory_path = ['../../dataset/kspon/eval_clean',
                           '../../dataset/kspon/eval_other',]
-        get_audio_list(directory_path, '../../dataset/kspon-test-20480.txt', audio_window=20480, file_extension="wav")
+        get_audio_list(directory_path, '../../dataset/kspon-test.txt', audio_window=20480, file_extension="wav")
     elif name == "librispeech360":
         train_directory_path = ['../../dataset/LibriSpeech/train-clean-360']
         get_audio_list(train_directory_path, '../../dataset/librispeech360-20480.txt', audio_window=20480)
@@ -95,12 +95,12 @@ if __name__ == '__main__':
         train_dataset_path = ['../../dataset/ravdess']
         get_audio_list(train_dataset_path, '../../dataset/ravdess.txt', audio_window=20480, file_extension='wav')
     elif name == 'librispeech':
-        train_dataset_path = ['../../dataset/LibriSpeech/train-clean-100',
-                              '../../dataset/LibriSpeech/train-clean-360',
-                              '../../dataset/LibriSpeech/train-other-360',]
+        train_dataset_path = ['../../dataset/librispeech/LibriSpeech/train-clean-100',
+                              '../../dataset/librispeech/LibriSpeech/train-clean-360',
+                              '../../dataset/librispeech/LibriSpeech/train-other-500',]
         get_audio_list(train_dataset_path, '../../dataset/librispeech-train.txt', audio_window=20480, file_extension='wav')
-        train_dataset_path = ['../../dataset/LibriSpeech/test-clean',
-                              '../../dataset/LibriSpeech/test-other', ]
+        train_dataset_path = ['../../dataset/librispeech/LibriSpeech/test-clean',
+                              '../../dataset/librispeech/LibriSpeech/test-other', ]
         get_audio_list(train_dataset_path, '../../dataset/librispeech-test.txt', audio_window=20480,
                        file_extension='wav')
     elif name == 'voxforge':

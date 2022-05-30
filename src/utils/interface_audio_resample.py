@@ -1,5 +1,5 @@
 import os
-
+import wave
 import soundfile as sf
 from tqdm import tqdm
 import src.utils.interface_file_io as io
@@ -51,6 +51,22 @@ def get_pcm_to_convert_wav(file_list, file_extension="pcm"):
             proc = os.getpid()
             print("P{}: {}/{}".format(proc, index, list_size))
 
+
+def get_pcm_to_convert_wav_2(file_list, file_extension="pcm"):
+    list_size = len(file_list)
+    for index, file in enumerate(file_list):
+        new_filename = file.replace(file_extension, 'wav')
+        with open(file, 'rb') as opened_pcm_file:
+            pcm_data = opened_pcm_file.read()
+            obj2write = wave.open(new_filename, 'wb')
+            obj2write.setnchannels(1)
+            obj2write.setsampwidth(16 // 8)
+            obj2write.setframerate(16000)
+            obj2write.writeframes(pcm_data)
+            obj2write.close()
+        if index % 50 == 0:
+            proc = os.getpid()
+            print("P{}: {}/{}".format(proc, index, list_size))
 
 
 def resampling_audio(file_list):

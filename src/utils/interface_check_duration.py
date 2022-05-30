@@ -3,9 +3,11 @@ import src.utils.interface_audio_io as audio_io
 from tqdm import tqdm
 
 
-def main():
-    dataset_path = '../../dataset/IEMOCAP_full_release'
+def check_duration():
+    dataset_path = '../../dataset/kspon'
     file_list = file_io.get_all_file_path(dataset_path, 'wav')
+    print(dataset_path)
+    print(len(file_list))
 
     total_length = 0
     for file in tqdm(file_list):
@@ -16,4 +18,4 @@ def main():
     print(sr)
 
 if __name__ == '__main__':
-    main()
+    check_duration()

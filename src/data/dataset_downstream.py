@@ -3,7 +3,6 @@ import src.utils.interface_file_io as file_io
 import src.utils.interface_audio_io as audio_io
 import src.utils.interface_audio_augmentation as audio_augmentation
 from src.data import dataset as dataset
-import torch.nn.functional as F
 import random
 import natsort
 import pandas as pd

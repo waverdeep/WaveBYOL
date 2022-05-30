@@ -1,5 +1,4 @@
 import src.data.dataset_wavebyol as dataset_wavebyol
-import src.data.dataset_wavebyol_verific as dataset_wavebyol_verific
 import src.data.dataset_downstream as dataset_downstream
 import src.utils.interface_audio_io as audio_io
 from torch.utils import data
@@ -27,26 +26,7 @@ def get_dataloader(config, mode="train"):
     train_type = config['train_type']
     dataset = None
 
-    if "pretext_verification" == train_type:
-        dataset = dataset_wavebyol_verific.WaveformDatasetByWaveBYOLVerification01(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['{}_augmentation_count'.format(mode)],
-            randomness=config['randomness'],
-            normalize=config['normalize'],
-            config=config
-        )
-    elif 'pretext' in train_type:
-        dataset = dataset_wavebyol.WaveformDatasetByWaveBYOL(
-            file_path=config['{}_dataset'.format(mode)],
-            audio_window=config['audio_window'],
-            sampling_rate=config['sampling_rate'],
-            augmentation=config['{}_augmentation'.format(mode)],
-            augmentation_count=config['augmentation_count']
-        )
-    elif 'pretext_u2' in train_type:
+    if 'pretext' in train_type:
         dataset = dataset_wavebyol.WaveformDatasetByWaveBYOL(
             file_path=config['{}_dataset'.format(mode)],
             audio_window=config['audio_window'],
