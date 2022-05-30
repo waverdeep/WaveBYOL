@@ -50,6 +50,7 @@ def make_downstream_target(label, label_dict):
     targets = torch.zeros(len(label)).long()
     for idx in range(len(label)):
         targets[idx] = label_dict[label[idx]]
+        # print(label_dict[label[idx]], label[idx])
     return targets
 
 

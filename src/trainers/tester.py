@@ -70,6 +70,9 @@ def test_downstream(config, pretext_model, downstream_model, downstream_dataload
             total_target.append(target.cpu())
             total_predict.append(predicted.cpu())
 
+            print(target)
+            print(predicted)
+
             writer.add_scalar("Downstream_loss/test_step", out_loss,
                               (epoch - 1) * len(downstream_dataloader) + batch_idx)
             total_loss += len(waveform) * out_loss
@@ -102,6 +105,16 @@ def test_downstream(config, pretext_model, downstream_model, downstream_dataload
     tensorboard.add_confusion_matrix(writer=writer, title="downstream-test-confusion_matrix", desc="test",
                                      step=(epoch-1), label_num=config['downstream_output_dim'],
                                      targets=total_target, predicts=total_predict)
+
+    tensorboard.add_classification_matrix(config=config, epoch=epoch, writer=writer, title="downstream-test-classification_matrix", desc="test",
+                                     step=(epoch - 1), label_num=config['downstream_output_dim'],
+                                     targets=total_target, predicts=total_predict)
+
+    tensorboard.add_classification_avg_matrix(writer=writer, title="downstream-test-classification_avg_matrix", desc="test",
+                                     step=(epoch - 1), label_num=config['downstream_output_dim'],
+                                     targets=total_target, predicts=total_predict)
+
+
 
     return total_loss
 
@@ -161,6 +174,16 @@ def test_downstream_transfer(config, downstream_model, downstream_dataloader, do
     tensorboard.add_confusion_matrix(writer=writer, title="downstream-test-confusion_matrix", desc="test",
                                      step=(epoch - 1), label_num=config['downstream_output_dim'],
                                      targets=total_target, predicts=total_predict)
+
+    tensorboard.add_classification_matrix(config=config, epoch=epoch, writer=writer,
+                                          title="downstream-test-classification_matrix", desc="test",
+                                          step=(epoch - 1), label_num=config['downstream_output_dim'],
+                                          targets=total_target, predicts=total_predict)
+
+    tensorboard.add_classification_avg_matrix(writer=writer, title="downstream-test-classification_avg_matrix",
+                                              desc="test",
+                                              step=(epoch - 1), label_num=config['downstream_output_dim'],
+                                              targets=total_target, predicts=total_predict)
 
     return total_loss
 

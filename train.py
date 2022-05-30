@@ -11,18 +11,13 @@ import src.data.dataset as dataset
 import src.models.model as model
 import src.optimizers.optimizer as optimizer
 import src.optimizers.loss as loss
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def main():
-    parser = argparse.ArgumentParser(description='waverdeep - WaveBYOL')
+    parser = argparse.ArgumentParser(description=' WaveBYOL')
     parser.add_argument("--configuration", required=False,
-                        # default='./config_FTX/FT10-downstream-test.json')
-                        # default='./config_FTX/FT13-pretext-WaveBYOL-H4-AdamP-20480.json')
-                        default='./config_FT10/FT10-downstream-nsynth-WaveBYOL-H2-AdamP-20480.json')
-                        # default='./config_FTX/FT10-pretext-WaveBYOL-H2-AdamP-kspon-20480.json')
-                        # default='./config_FTX_TRNSFR/FT10-transfer-embedd-voxceleb-WaveBYOL-H2-Adam-20480.json')
-                        # default='./config_FTX_TRNSFR/FT10-transfer-iemocap-WaveBYOL-H2-Adam-20480.json')
+                        default='./config_FT30/FT10-pretext-WaveBYOL-H2-Kspon-AdamP-20480.json')
     args = parser.parse_args()
     now = train_tool.setup_timestamp()
 
