@@ -4,9 +4,11 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
+import src.models.model_feature_encoder as model_feature_encoder
+
 # import torchsummary
 # from torchinfo import summary
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def set_requires_grad(model, requires):
@@ -37,343 +39,6 @@ def update_moving_average(ema_updater, ma_model, current_model):
         ma_params.data = ema_updater.update_average(old_weight, up_weight)
 
 
-def select_feature_extractor_model(model_name, pretrain=True):
-    feature_extractor_model = nn.Sequential()
-    if model_name == "resnet50":
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet50(pretrained=pretrain).conv1,
-                torchvision.models.resnet50(pretrained=pretrain).bn1,
-                torchvision.models.resnet50(pretrained=pretrain).relu,
-                torchvision.models.resnet50(pretrained=pretrain).maxpool,
-                torchvision.models.resnet50(pretrained=pretrain).layer1,
-                torchvision.models.resnet50(pretrained=pretrain).layer2,
-                torchvision.models.resnet50(pretrained=pretrain).layer3,
-                torchvision.models.resnet50(pretrained=pretrain).layer4,
-            )
-        )
-    elif model_name == "resnet50_term01":
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet50(pretrained=pretrain).conv1,
-                torchvision.models.resnet50(pretrained=pretrain).bn1,
-                torchvision.models.resnet50(pretrained=pretrain).relu,
-                torchvision.models.resnet50(pretrained=pretrain).layer1,
-                torchvision.models.resnet50(pretrained=pretrain).layer2,
-            )
-        )
-    elif model_name == "resnet50_term02":
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet50(pretrained=pretrain).conv1,
-                torchvision.models.resnet50(pretrained=pretrain).bn1,
-                torchvision.models.resnet50(pretrained=pretrain).relu,
-                torchvision.models.resnet50(pretrained=pretrain).layer1,
-                torchvision.models.resnet50(pretrained=pretrain).layer2,
-                torchvision.models.resnet50(pretrained=pretrain).layer3,
-                torchvision.models.resnet50(pretrained=pretrain).layer4,
-            )
-        )
-    elif model_name == 'resnet152':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet152(pretrained=pretrain).conv1,
-                torchvision.models.resnet152(pretrained=pretrain).bn1,
-                torchvision.models.resnet152(pretrained=pretrain).relu,
-                torchvision.models.resnet152(pretrained=pretrain).maxpool,
-                torchvision.models.resnet152(pretrained=pretrain).layer1,
-                torchvision.models.resnet152(pretrained=pretrain).layer2,
-                torchvision.models.resnet152(pretrained=pretrain).layer3,
-                torchvision.models.resnet152(pretrained=pretrain).layer4,
-            )
-        )
-    elif model_name == 'resnet152_term01':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet152(pretrained=pretrain).conv1,
-                torchvision.models.resnet152(pretrained=pretrain).bn1,
-                torchvision.models.resnet152(pretrained=pretrain).relu,
-                torchvision.models.resnet152(pretrained=pretrain).layer1,
-                torchvision.models.resnet152(pretrained=pretrain).layer2,
-            )
-        )
-    elif model_name == 'resnet18':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-
-                torchvision.models.resnet18(pretrained=pretrain).conv1,
-                torchvision.models.resnet18(pretrained=pretrain).bn1,
-                torchvision.models.resnet18(pretrained=pretrain).relu,
-                torchvision.models.resnet18(pretrained=pretrain).maxpool,
-                torchvision.models.resnet18(pretrained=pretrain).layer1,
-                torchvision.models.resnet18(pretrained=pretrain).layer2,
-                torchvision.models.resnet18(pretrained=pretrain).layer3,
-                torchvision.models.resnet18(pretrained=pretrain).layer4,
-            )
-        )
-    elif model_name == 'resnet18_term01':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.resnet18(pretrained=pretrain).conv1,
-                torchvision.models.resnet18(pretrained=pretrain).bn1,
-                torchvision.models.resnet18(pretrained=pretrain).relu,
-                torchvision.models.resnet18(pretrained=pretrain).layer1,
-                torchvision.models.resnet18(pretrained=pretrain).layer2,
-                torchvision.models.resnet18(pretrained=pretrain).layer3,
-                torchvision.models.resnet18(pretrained=pretrain).layer4,
-            )
-        )
-    elif model_name == 'mobilenetv2':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.mobilenet_v2(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'mobilenetv3_small':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.mobilenet_v3_small(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'mobilenetv3_large':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.mobilenet_v3_large(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'efficientnet_b0':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.efficientnet_b0(pretrained=pretrain).features
-            )
-        )
-    elif model_name  == 'efficientnet_b4':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.efficientnet_b4(pretrained=pretrain).features
-            )
-        )
-    elif model_name  == 'efficientnet_b7':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.efficientnet_b7(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'vgg11bn':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.vgg11_bn(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'vgg16bn':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.vgg16_bn(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'vgg19bn':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                torchvision.models.vgg19_bn(pretrained=pretrain).features
-            )
-        )
-    elif model_name == 'ba':
-
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                nn.Conv2d(3, 64, 64, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(64, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(128, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-            )
-        )
-    elif model_name == 'h1':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                nn.Conv2d(3, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(64, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(128, 256, 3, stride=1, padding=1),
-                nn.BatchNorm2d(256),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(256, 256, 3, stride=1, padding=1),
-                nn.BatchNorm2d(256),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-            )
-        )
-    elif model_name == 'h2':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                nn.Conv2d(3, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-
-                nn.Conv2d(64, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(128, 256, 3, stride=1, padding=1),
-                nn.BatchNorm2d(256),
-                nn.ReLU(),
-
-                nn.Conv2d(256, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(512, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-
-                nn.Conv2d(512, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(512, 1024, 3, stride=1, padding=1),
-                nn.BatchNorm2d(1024),
-                nn.ReLU(),
-
-                nn.Conv2d(1024, 1024, 3, stride=1, padding=1),
-                nn.BatchNorm2d(1024),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-            )
-        )
-    elif model_name == 'h3':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                nn.Conv2d(3, 16, 3, stride=1, padding=1),
-                nn.BatchNorm2d(16),
-                nn.ReLU(),
-
-                nn.Conv2d(16, 16, 3, stride=1, padding=1),
-                nn.BatchNorm2d(16),
-                nn.ReLU(),
-                nn.Conv2d(16, 32, 3, stride=1, padding=1),
-                nn.BatchNorm2d(32),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(32, 32, 3, stride=1, padding=1),
-                nn.BatchNorm2d(32),
-                nn.ReLU(),
-                nn.Conv2d(32, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(64, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.Conv2d(64, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(128, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.Conv2d(128, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(512, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-                nn.Conv2d(512, 1024, 3, stride=1, padding=1),
-                nn.BatchNorm2d(1024),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-            )
-        )
-    elif model_name == 'h4':
-        feature_extractor_model.add_module(
-            "feature_extractor_layer",
-            nn.Sequential(
-                nn.Conv2d(3, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-
-                nn.Conv2d(64, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(128, 256, 3, stride=1, padding=1),
-                nn.BatchNorm2d(256),
-                nn.ReLU(),
-
-                nn.Conv2d(256, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(512, 512, 3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(),
-
-                nn.Conv2d(512, 1024, 3, stride=1, padding=1),
-                nn.BatchNorm2d(1024),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-
-                nn.Conv2d(1024, 1024, 3, stride=1, padding=1),
-                nn.BatchNorm2d(1024),
-                nn.ReLU(),
-
-                nn.Conv2d(1024, 2048, 3, stride=1, padding=1),
-                nn.BatchNorm2d(2048),
-                nn.ReLU(),
-                nn.MaxPool2d(2, stride=2),
-            )
-        )
-
-    return feature_extractor_model
-
-
 class MLPNetwork(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(MLPNetwork, self).__init__()
@@ -391,13 +56,13 @@ class MLPNetwork(nn.Module):
 class Encoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, stride, filter_size, padding, feature_extractor_model, pretrain):
         super(Encoder, self).__init__()
-        assert(
+        assert (
                 len(stride) == len(filter_size) == len(padding)
         ), "Inconsistent length of strides, filter sizes and padding"
 
-        self.encoder = nn.Sequential()
+        self.feature_extractor_step = nn.Sequential()
         for index, (stride, filter_size, padding) in enumerate(zip(stride, filter_size, padding)):
-            self.encoder.add_module(
+            self.feature_extractor_step.add_module(
                 "encoder_layer_{}".format(index),
                 nn.Sequential(
                     nn.Conv1d(in_channels=input_dim, out_channels=hidden_dim,
@@ -408,16 +73,17 @@ class Encoder(nn.Module):
             )
             input_dim = hidden_dim
 
-        self.feature_extractor = select_feature_extractor_model(model_name=feature_extractor_model, pretrain=pretrain)
-
+        self.feature_encoding_step = model_feature_encoder.select_feature_encoder_model(
+            model_name=feature_extractor_model, pretrain=pretrain)
 
         self.adaptive_average_pooling = nn.AdaptiveAvgPool2d(1)
         self.adaptive_max_pooling = nn.AdaptiveMaxPool2d(1)
 
     def forward(self, x):
+        out = x
         # normalize 먼저 진행 (batch 단위로)
-        out = F.normalize(x, dim=-1, p=2)
-        out = self.encoder(out)
+        out = F.normalize(out, dim=-1, p=2)
+        out = self.feature_extractor_step(out)
 
         # chunk and stack layer
         chunks = out.chunk(3, dim=1)
@@ -425,7 +91,7 @@ class Encoder(nn.Module):
 
         out_cat = F.normalize(out_cat, dim=-1, p=2)
         # feature extract layer
-        out_feature = self.feature_extractor(out_cat)
+        out_feature = self.feature_encoding_step(out_cat)
 
         out01 = self.adaptive_max_pooling(out_feature)
         B, T, D, C = out01.shape
@@ -523,12 +189,9 @@ class WaveBYOL(nn.Module):
 
 if __name__ == '__main__':
     test_model = WaveBYOL(
-        config={"ema_decay":0.99},
+        config={"ema_decay": 0.99},
         encoder_input_dim=1,
         encoder_hidden_dim=513,
-        # encoder_filter_size=[10, 3, 3, 3, 3, 2, 2],
-        # encoder_stride=[5, 2, 2, 2, 2, 2, 2],
-        # encoder_padding=[2, 2, 2, 2, 2, 2, 1],
         encoder_filter_size=[10, 8, 4, 2, 2],
         encoder_stride=[5, 4, 2, 2, 2],
         encoder_padding=[2, 2, 2, 2, 1],
@@ -536,10 +199,10 @@ if __name__ == '__main__':
         mlp_hidden_dim=4096,
         mlp_output_dim=4096,
         feature_extractor_model="h2",
-        pretrain=True
-    )
+        pretrain=False
+    ).cuda()
 
-    test_data = torch.rand(2, 1, 20480)
+    test_data = torch.rand(2, 1, 20480).cuda()
     out_loss, _ = test_model(test_data, test_data)
     pretext_model_params = sum(p.numel() for p in test_model.online_encoder_network.parameters() if p.requires_grad)
     print("encoder parameters: {}".format(pretext_model_params))
@@ -547,10 +210,3 @@ if __name__ == '__main__':
     output = test_model.get_representation(test_data)
     print(output[0].size())
     print(output[1].size())
-    # test_data = (torch.rand(2, 1, 20480), torch.rand(2, 1, 20480))
-    # summary(test_model, input_size=((16, 1, 20480), (16, 1, 20480)))
-    # summary(test_model.online_encoder_network, input_size=((16, 1, 20480)))
-
-
-
-
