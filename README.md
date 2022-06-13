@@ -37,6 +37,7 @@ We propose WaveBYOL model that can learn general-purpose audio representations d
 
 1. Make up own your configuration file.  (There is an pretext example in the config folder)
 2. You can modify this part at [train.py](https://github.com/waverDeep/ImageBYOL/blob/master/train.py)
+3. Here's [pretrained model](https://drive.google.com/file/d/1WiywJO5wNqpDGHDYLEn6mAjPGA623Jsf/view?usp=sharing)
 ```
 ...
 ...
