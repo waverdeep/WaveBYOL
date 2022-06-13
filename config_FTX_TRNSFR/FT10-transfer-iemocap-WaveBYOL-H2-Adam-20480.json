@@ -47,5 +47,5 @@
 	"pretext_checkpoint": "./checkpoint/FT10-pretext-WaveBYOL-H2-AdamP-20480-model-best-2022_4_2_17_9_39-epoch-204.pt",
 	"downstream_checkpoint": null,
 	"tensorboard_writer_name": "./runs/FT10-tranasfer-iemocap-WaveBYOL-H2-Adam-20480",
-	"checkpoint_file_name": "FT10-tranasfer-iemocap-WaveBYOL-H2-Adam-20480"
+	"checkpoint_file_name": if
 }

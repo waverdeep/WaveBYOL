@@ -5,6 +5,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import src.models.model_feature_encoder as model_feature_encoder
+import torchvision.transforms as transforms
 
 # import torchsummary
 # from torchinfo import summary
@@ -39,6 +40,15 @@ def update_moving_average(ema_updater, ma_model, current_model):
         ma_params.data = ema_updater.update_average(old_weight, up_weight)
 
 
+def tensor_random_erasing(x, p=0.5):
+    length = len(x)
+    erasing = transforms.RandomErasing(p=p)
+    for i in range(length):
+        x[i] = erasing(x[i])
+    return x
+
+
+
 class MLPNetwork(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(MLPNetwork, self).__init__()
@@ -54,7 +64,7 @@ class MLPNetwork(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, input_dim, hidden_dim, stride, filter_size, padding, feature_extractor_model, pretrain):
+    def __init__(self, input_dim, hidden_dim, stride, filter_size, padding, feature_extractor_model, pretrain, config):
         super(Encoder, self).__init__()
         assert (
                 len(stride) == len(filter_size) == len(padding)
@@ -84,10 +94,11 @@ class Encoder(nn.Module):
         # normalize 먼저 진행 (batch 단위로)
         out = F.normalize(out, dim=-1, p=2)
         out = self.feature_extractor_step(out)
-
         # chunk and stack layer
         chunks = out.chunk(3, dim=1)
         out_cat = torch.stack(chunks, dim=1)
+        # if self.training is True:
+        #     out_cat = tensor_random_erasing(out_cat)
 
         out_cat = F.normalize(out_cat, dim=-1, p=2)
         # feature extract layer
@@ -122,7 +133,8 @@ class WaveBYOL(nn.Module):
             stride=encoder_stride,
             padding=encoder_padding,
             feature_extractor_model=feature_extractor_model,
-            pretrain=pretrain
+            pretrain=pretrain,
+            config=config,
         )
 
         self.online_projector_network = MLPNetwork(
@@ -207,6 +219,7 @@ if __name__ == '__main__':
     pretext_model_params = sum(p.numel() for p in test_model.online_encoder_network.parameters() if p.requires_grad)
     print("encoder parameters: {}".format(pretext_model_params))
     print(out_loss)
+    test_model.eval()
     output = test_model.get_representation(test_data)
     print(output[0].size())
     print(output[1].size())

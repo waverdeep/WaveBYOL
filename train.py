@@ -17,7 +17,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 def main():
     parser = argparse.ArgumentParser(description=' WaveBYOL')
     parser.add_argument("--configuration", required=False,
-                        default='./config_FT30/FT10-pretext-WaveBYOL-H2-Kspon-AdamP-20480.json')
+                        default='./config_FT10/FT10-pretext-WaveBYOL-H2-AdamP-20480.json')
     args = parser.parse_args()
     now = train_tool.setup_timestamp()
 
@@ -152,6 +152,11 @@ def main():
                 if test_loss > best_loss:
                     early_stop += 1
                     print(">> count early stop: {}".format(early_stop))
+
+            if count % 10 == 0:
+                train_tool.save_checkpoint(config=config, model=pretext_model, optimizer=model_optimizer,
+                                           loss=test_loss, epoch=best_epoch, mode="step",
+                                           date='{}'.format(now))
 
         if early_stop > 9:
             print(">> early stopped... ")
